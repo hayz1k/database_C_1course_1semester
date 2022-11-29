@@ -1,0 +1,96 @@
+struct person {
+	int id;
+	char personal_account[20];
+	char surname[20];
+	int current_counter;
+	int for_payment;
+	int payment;
+};
+
+struct sorted_person {
+	int id;
+	char personal_account[20];
+	char surname[20];
+	int current_counter;
+	int for_payment;
+	int payment;
+};
+
+//void User(struct person* person) {
+//	setlocale(LC_ALL, "RUS");
+//	printf("{id: %d, Лицевой счет: \"%s\", Фамилия: \"%s\", Текущее показание счетчика: \"%s\", Начислено к оплате: \"%s\", Сумма оплаты: \"%s\}\n",
+//		person->id, person->personal_account, person->surname, person->current_counter, person->for_payment, person->payment);
+
+void main() {
+	setlocale(LC_ALL, "RUS");
+	system("chcp 1251");
+	system("cls");
+	int search_payment, size, end = 0;
+	char search_surname[20];
+	struct person data; 
+	struct sorted_person sort;
+
+	puts("Введите количество пользователей");
+	scanf("%d", &size);
+	size = size <= 10 ? size : 10;
+
+	for (int i = 0; i < size; i++) {
+		data.id = i;
+		printf("Пользователь #%d:\n", i);
+
+		printf("Введите номер лицевого счета : ");
+		scanf("%s", data.personal_account);
+
+		printf("Введите фамилию : ");
+		scanf("%s", data.surname);
+
+		printf("Введите показания счетчика : ");
+		scanf("%d", &data.current_counter);
+
+		printf("Начислено к оплате : ");
+		scanf("%d", &data.for_payment);
+
+		printf("Сумма оплаты : ");
+		scanf("%d", &data.payment);
+	}
+
+
+	while (end != 4) {
+		puts("Выберите команду:\n1. Найти потребителя по сумме оплаты\n2. Найти потребителя по фамилии\n3. Отсортировать по сумме оплаты\n4. Выйти из программы");
+		scanf("%d", &end);
+		switch (end) {
+		case 1: 
+			// не сравнивает одинаковые значения, разобраться
+			printf("Введите сумму оплаты : ");
+			scanf("%d", &search_payment);
+			for (int i = 0; i < size; i++) {
+				int current_payment = data.payment;
+				printf("есть %d надо %d", data.payment, search_payment);
+				if (current_payment == search_payment) {
+					printf("id: %d, Лицевой счет: \"%s\", Фамилия: \"%s\", Текущее показание счетчика: \"%s\", Начислено к оплате: \"%s\", Сумма оплаты: \"%s\}\n",
+						i, data.id, data.surname, data.current_counter, data.current_counter, data.for_payment, data.payment);
+				}
+			}
+			break;
+
+		case 2:
+			// не сравнивает одинаковые значения, разобраться
+			printf("Введите фамилию потребителя : ");
+			scanf("%s", &search_surname);
+			for (int i = 0; i < size; i++) {
+				if (data.surname == search_surname) {
+					printf("id: %d, Лицевой счет: \"%s\", Фамилия: \"%s\", Текущее показание счетчика: \"%s\", Начислено к оплате: \"%s\", Сумма оплаты: \"%s\}\n",
+						i, data.id, data.surname, data.current_counter, data.current_counter, data.for_payment, data.payment);
+				}
+			}
+			break;
+
+		case 3:
+			puts("В разработке");
+			break;
+
+		case 4:
+			break;
+		}
+	}
+}
