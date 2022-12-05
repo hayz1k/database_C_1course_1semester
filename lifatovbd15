@@ -16,7 +16,6 @@
 
 
 struct person {
-	int id;
 	char personal_account;
 	char surname;
 	int current_counter;
