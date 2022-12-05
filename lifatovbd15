@@ -15,15 +15,16 @@
 #include <ctype.h>
 
 
+
 struct person {
-	char personal_account;
-	char surname;
+	char personal_account[20];
+	char surname[20];
 	int current_counter;
 	int for_payment;
 	int payment;
 };
-typedef struct person data;
 
+typedef struct person data;
 
 int payment_search(data* ptr_struct, int payment, int size) {
 	for (int i = 0; i <= size; i++) {
@@ -46,20 +47,18 @@ int surname_search(data* ptr_struct, char surname, int size) {
 
 
 void tabulation(data* ptr_struct, int c, int k) {
-	for (int i = c; i < k; i++) {
-		puts("------------------------------------");
-		printf("| Лицевой счет: %s\n", ptr_struct[i].personal_account);
-		printf("| Фамилия: %s\n", ptr_struct[i].surname);
-		printf("| Текущее показание счетчика: %d\n", ptr_struct[i].current_counter);
-		printf("| Начислено к оплатей: %d\n", ptr_struct[i].for_payment);
-		printf("| Сумма оплаты: %d\n", ptr_struct[i].payment);
-		puts("------------------------------------");
+	for (int i = c; i <= k; i++) {
+		printf("Лицевой счет: %s\n", &ptr_struct[i].personal_account);
+		printf("Фамилия: %s\n", &ptr_struct[i].surname);
+		printf("Текущее показание счетчика: %d\n", ptr_struct[i].current_counter);
+		printf("Начислено к оплатей: %d\n", ptr_struct[i].for_payment);
+		printf("Сумма оплаты: %d\n", ptr_struct[i].payment);
 	}
 
 
 }
 
-void add_data(data *ptr_struct, int size) {
+void add_data(data* ptr_struct, int size) {
 	for (int i = 0; i < size; i++) {
 
 		printf("Введите номер лицевого счета : ");
@@ -82,14 +81,14 @@ void add_data(data *ptr_struct, int size) {
 
 void main() {
 	setlocale(LC_ALL, "RUS");
-	system("chcp 1251");
-	system("cls");
-	int search_payment, x, y, size, end = 0, chislo = 0;
+	int search_payment, x, y, size, end = 0;
 	char search_surname[20];
 	puts("Введите количество пользователей");
 	scanf("%d", &size);
 	size = size <= 10 ? size : 10;
-	data base[100], * ptr_struct = &base[size];
+	data p;
+	data* ptr_struct = NULL;
+	ptr_struct = &p;
 
 
 	while (end != 6) {
