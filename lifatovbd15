@@ -27,7 +27,9 @@ int payment_search(data* ptr_struct, int size);
 int surname_search(data* ptr_struct, int size);
 void tabulation(data* ptr_struct, int c, int k);
 void add_data(data* ptr_struct, int size);
+int compare_paymentname(const void* av, const void* bv);
 void sort(data* ptr_struct, int size);
+
 
 
 void main() {
@@ -96,15 +98,17 @@ void main() {
 }
 
 
-
-int compare(const void* x1, const void* x2) {
-	return (*(int*)x1 - *(int*)x2); 
+int compare_paymentname(const void* av, const void* bv) {
+	const struct person* a = av, * b = bv;
+	if (a->payment < b->payment) return -1;
+	if (a->payment > b->payment) return 1;
+	return -strcmp(a->personal_account, b->personal_account);
 }
-
 
 // Сортировка по сумме оплаты
 void sort(data* ptr_struct, int size) {
-
+	qsort(ptr_struct, size, sizeof(struct person), compare_paymentname);
+	tabulation(ptr_struct, 0, size);
 }
 
 void menu() {
