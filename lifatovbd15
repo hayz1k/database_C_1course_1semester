@@ -1,79 +1,87 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_WARNINGS
 
-#define N 10
-#define euler 2.718281828459045235360287471352
-#define M_PI = 3.14159265359
 
 #include <stdio.h>
 #include <math.h>
 #include <locale.h>
-#include <time.h>
 #include <string.h>
 #include <conio.h>
 #include <stdlib.h>
 #include <ctype.h>
 
 
-
+// Структура, содержащая данные о потребителе
 struct person {
-	char personal_account[20];
-	char surname[20];
-	int current_counter;
-	int for_payment;
-	int payment;
+	char personal_account[20]; // Лицевой счет
+	char surname[20];          // Фамилия
+	int current_counter;       // Текущее показание счетчика
+	int for_payment;           // Начислено к оплате
+	int payment;               // Сумма оплаты
 };
 
 typedef struct person data;
 
+
+// Поиск потребителя по критерию (по сумме оплаты)
 int payment_search(data* ptr_struct, int payment, int size) {
 	for (int i = 0; i <= size; i++) {
 		if (ptr_struct[i].payment == payment) {
 			return i;
 		}
 	}
-	return 0;
-}
-
-
-int surname_search(data* ptr_struct, char surname, int size) {
-	for (int i = 0; i <= size; i++) {
-		if (ptr_struct[i].surname == surname) {
-			return i;
-		}
-	}
+	// При несовпадении суммы оплаты ни с одним потребителем возвращаем 999 для обработки ошибок
 	return 999;
 }
 
 
+// Поиск потребителя по критерию (по фамилии)
+int surname_search(data* ptr_struct, char surname[20], int size) {
+	for (int i = 0; i <= size; i++) {
+		// strcmp сравнивает (str1, str2) побайтно, при полном совпадении возвращает 0
+		// далее если функция все таки вернет нам 0, мы возвращаем индекс потребителя для дальнейшего вывода
+		if (strcmp(ptr_struct[i].surname, surname) == 0)
+			return i;
+	}
+	// При несовпадении фамилии ни с одним потребителем возвращаем 999 для обработки ошибок
+	return 999; 
+}
+
+
+// Табуляция информации о потребителе/потребителях на экран
 void tabulation(data* ptr_struct, int c, int k) {
 	for (int i = c; i <= k; i++) {
+		printf("-----------------------------------------------------\n");
 		printf("Лицевой счет: %s\n", &ptr_struct[i].personal_account);
 		printf("Фамилия: %s\n", &ptr_struct[i].surname);
 		printf("Текущее показание счетчика: %d\n", ptr_struct[i].current_counter);
-		printf("Начислено к оплатей: %d\n", ptr_struct[i].for_payment);
+		printf("Начислено к оплате: %d\n", ptr_struct[i].for_payment);
 		printf("Сумма оплаты: %d\n", ptr_struct[i].payment);
+		printf("-----------------------------------------------------\n");
+
 	}
 
 
 }
-
+// Запись данных о потребителях
 void add_data(data* ptr_struct, int size) {
+	int tarif = 5; // Возьмем тариф за единицу показаний счетчика = 5 рублей
 	for (int i = 0; i < size; i++) {
 
-		printf("Введите номер лицевого счета : ");
+		printf("Введите номер лицевого счета: ");
 		scanf("%s", &ptr_struct[i].personal_account);
 
-		printf("Введите фамилию : ");
+		printf("Введите фамилию: ");
 		scanf("%s", &ptr_struct[i].surname);
 
-		printf("Введите показания счетчика : ");
+		printf("Введите показания счетчика: ");
 		scanf("%d", &ptr_struct[i].current_counter);
 
-		printf("Начислено к оплате : ");
-		scanf("%d", &ptr_struct[i].for_payment);
+		// Подсчет суммы денег, начисленной к оплате
+		ptr_struct[i].for_payment = tarif * ptr_struct[i].current_counter;
+		printf("Начислено к оплате: %d\n", ptr_struct[i].for_payment);
 
-		printf("Сумма оплаты : ");
+		printf("Сумма оплаты: ");
 		scanf("%d", &ptr_struct[i].payment);
 	}
 }
@@ -83,6 +91,7 @@ void main() {
 	setlocale(LC_ALL, "RUS");
 	int search_payment, x, y, size, end = 0;
 	char search_surname[20];
+
 	puts("Введите количество пользователей");
 	scanf("%d", &size);
 	size = size <= 10 ? size : 10;
@@ -92,36 +101,65 @@ void main() {
 
 
 	while (end != 6) {
-		puts("Выберите команду:\n1. Ввести данные о потребителях\n2. Найти потребителя по сумме оплаты\n3. Найти потребителя по фамилии\n4. Отсортировать по сумме оплаты\n5. Выйти из программы");
-		scanf("%d", &end);
-		switch (end) {
-		case 1:
+
+		puts("-------------------МЕНЮ--------------------");
+		puts("\nВыберите команду:");
+		puts("1. Ввести данные о потребителях");
+		puts("2. Найти потребителя по сумме оплаты");
+		puts("3. Найти потребителя по фамилии");
+		puts("4. Отсортировать по сумме оплаты");
+		puts("5. Вывести данные о потребителях");
+		puts("6. Выйти из программы");
+		puts("-------------------------------------------");
+		
+
+		scanf("%d", &end); // Ввод выбора варианта в меню с клавиатуры
+		switch (end) {     // Проверка ввода с клавиатуры для взаимодействия с меню
+
+		// Ввести данные о потребителе
+		case 1: 
 			add_data(ptr_struct, size);
 			break;
 
+		// Найти потребителя по сумме оплаты
 		case 2:
 			printf("Введите сумму оплаты : ");
 			scanf("%d", &search_payment);
 
-			x = payment_search(ptr_struct, search_payment, size);
-			if (x != 999) tabulation(ptr_struct, x, x);
+
+
+			// Переменная <x> хранит в себе индекс пользователя, найденного по сумме оплаты,
+			// или же 999 в случае если такого пользователя нет
+			x = payment_search(ptr_struct, search_payment, size);  
+			if (x != 999) tabulation(ptr_struct, x, x);		       
 			else printf("Пользователь не найден\n");
 			break;
 
+		// Найти потребителя по фамилии
 		case 3:
-			printf("Введите фамилию потребителя : ");
+			printf("Введите фамилию потребителя : \n");
 			scanf("%s", &search_surname);
 
-			y = surname_search(ptr_struct, search_surname, size);
-			if (y != 999) tabulation(ptr_struct, y, y);
+
+			// Переменная <y> хранит в себе индекс пользователя, найденного по фамилии,
+			// или же 999 в случае если такого пользователя нет
+			y = surname_search(ptr_struct, search_surname, size);  
+			if (y != 999) tabulation(ptr_struct, y, y);            
 			else printf("Пользователь не найден\n");
 			break;
 
+		// Отсортировать список структур по критерию (сумма оплаты)
 		case 4:
 			puts("В разработке");
 			break;
 
+		// Вывод информации о всех потребителях
 		case 5:
+
+			break;
+
+		// Выход из программы
+		case 6:
 			break;
 		}
 	}
