@@ -22,6 +22,7 @@ struct person {
 };
 
 typedef struct person data;
+
 void menu();
 int payment_search(data* ptr_struct, int size);
 int surname_search(data* ptr_struct, int size);
