@@ -100,15 +100,15 @@ void main() {
 
 
 int compare_paymentname(const void* av, const void* bv) {
-	const struct person* a = av, * b = bv;
+	const data* a = av, * b = bv;
 	if (a->payment < b->payment) return -1;
 	if (a->payment > b->payment) return 1;
-	return -strcmp(a->personal_account, b->personal_account);
+	return strcmp(a->personal_account, b->personal_account);
 }
 
 // Сортировка по сумме оплаты
 void sort(data* ptr_struct, int size) {
-	qsort(ptr_struct, size, sizeof(struct person), compare_paymentname);
+	qsort(ptr_struct, size, sizeof(data), compare_paymentname);
 	tabulation(ptr_struct, 0, size);
 }
 
@@ -150,7 +150,7 @@ int surname_search(data* ptr_struct, int size) {
 			return i;
 	}
 	// При несовпадении фамилии ни с одним потребителем возвращаем 999 для обработки ошибок
-	return 999; 
+	return 999;
 }
 
 // Табуляция информации о потребителе/потребителях на экран
@@ -191,6 +191,5 @@ void add_data(data* ptr_struct, int size) {
 		scanf("%d", &ptr_struct[i].payment);
 	}
 }
-
 
 
