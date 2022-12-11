@@ -14,11 +14,16 @@
 
 // Структура, содержащая данные о потребителе
 struct person {
-	char personal_account[20]; // Лицевой счет
-	char surname[20];          // Фамилия
-	int current_counter;       // Текущее показание счетчика
-	int for_payment;           // Начислено к оплате
-	int payment;               // Сумма оплаты
+	char personal_account[20];    // Лицевой счет
+	char surname[20];             // Фамилия
+	int current_counter[3];       // Текущее показание счетчика
+	float for_payment[3];         // Начислено к оплате
+	float payment[3];             // Сумма оплаты
+	float debt[3];                // Долг по месяцам
+	float sr;                     // Средняя сумма оплаты за 3 месяца
+	float debt_sum;               // Общая сумма долга
+	float for_payment_sum;        // Общая сумма для оплаты
+	float payment_sum;            // Общая сумма оплаты
 };
 
 typedef struct person data;
@@ -27,51 +32,95 @@ void menu();
 int payment_search(data* ptr_struct, int size);
 int surname_search(data* ptr_struct, int size);
 void tabulation(data* ptr_struct, int c, int k);
+void full_tabulation(data* ptr_struct, int size);
 void add_data(data* ptr_struct, int size);
 int compare_paymentname(const void* av, const void* bv);
 void sort(data* ptr_struct, int size);
+void readfile(data* ptr_struct, int size);
+void writefile(data* ptr_struct, int size);
+
+
+void full_tabulation(data* ptr_struct, int size) {
+	printf("|---------|-------------------|-------|-----------|-------------|--------------|---------------|-------------|-------------|-------------|-------------|\n");
+	printf("| Лицевой |     Фамилия       | Месяц | Показания |  Начислено  | Сумма оплаты | Средняя сумма |   Долг по   | Общая сумма | Общая сумма | Общая сумма |\n");
+	printf("|    счет |                   |       |  счетчика |   к оплате  |              |        оплаты |   месяцам   |       долга |  для оплаты |      оплаты |\n");
+	printf("|---------|-------------------|-------|-----------|-------------|--------------|---------------|-------------|-------------|-------------|-------------|\n");
+	for (int i = 0; i < size; i++) {
+		printf("|         |                   |	  1   | %4d      | %-8.2f    | %-8.2f     |	       | % -8.2f    |             |             |   	       |\n",
+			ptr_struct[i].current_counter[0], ptr_struct[i].for_payment[0], ptr_struct[i].payment[0], ptr_struct[i].debt[0]);
+		printf("|         |                   |-------|-----------|-------------|--------------|               |-------------|             |             |             |\n");
+
+		printf("|   %s     | %10s        |	  2   | %4d      | %-8.2f    | %-8.2f     | %-8.2f      | % -8.2f    | % -8.2f    | %-8.2f    | %-8.2f    |\n",
+			ptr_struct[i].personal_account, ptr_struct[i].surname, ptr_struct[i].current_counter[1], ptr_struct[i].for_payment[1], ptr_struct[i].payment[1],
+			ptr_struct[i].sr, ptr_struct[i].debt[1], ptr_struct[i].debt_sum, ptr_struct[i].for_payment_sum, ptr_struct[i].payment_sum);
+		printf("|         |                   |-------|-----------|-------------|--------------|               |-------------|             |             |             |\n");
+
+		printf("|         |                   |	  3   | %4d      | %-8.2f    | %-8.2f     |	       | % -8.2f    |             |             |             |\n",
+			ptr_struct[i].current_counter[2], ptr_struct[i].for_payment[2], ptr_struct[i].payment[2], ptr_struct[i].debt[2]);
+
+		printf("|---------|-------------------|-------|-----------|-------------|--------------|---------------|-------------|-------------|-------------|-------------|\n");
+	}
+	
+
+}
 
 
 
 void main() {
 	setlocale(LC_ALL, "RUS");
-	int x, y, size, end = 0;
+	int x, y, size, end = 0, choice;
 	char search_surname[20];
 
 	puts("Введите количество пользователей");
 	scanf("%d", &size);
 	size = size <= 10 ? size : 10;
 	data p;
-	data* ptr_struct = NULL;
-	ptr_struct = &p;
+	data* ptr_struct = &p;
+	ptr_struct = (struct data*)malloc(size * sizeof(data));
 
-
-	while (end != 6) {
+	while (end != 8) {
 		menu(); // Вызываем функцию табуляции меню в консоль;
 		scanf("%d", &end);
 
 		switch (end) {
 
-
 		case 1: // Ввести данные о потребителе
+			system("cls");
 			add_data(ptr_struct, size);
 			break;
-
 
 		case 2: // Найти потребителя по сумме оплаты
 
 			// Переменная <x> хранит в себе индекс пользователя, найденного по сумме оплаты,
 			// или же 999 в случае если такого пользователя нет
-			x = payment_search(ptr_struct, size);
-			if (x != 999)
-				tabulation(ptr_struct, x, x + 1);
-			else
-				printf("Пользователь не найден\n");
+			system("cls");
+			printf("Выберите пункт:\n");
+			printf("1. Поиск потребителя по сумме оплаты за какой-либо месяц\n");
+			printf("2. Поиск потребителя по общей сумме оплаты\n");
+			scanf("%d", &choice);
+			switch (choice) {
+			case 1:
+				system("cls");
+				x = payment_search(ptr_struct, size);
+				if (x != 999)
+					tabulation(ptr_struct, x, x + 1);
+				else
+					printf("Пользователь не найден\n");
+				break;
+
+			case 2:
+				system("cls");
+				x = payment_sum_search(ptr_struct, size);
+				if (x != 999)
+					tabulation(ptr_struct, x, x + 1);
+				else
+					printf("Пользователь не найден\n");
+				break;
+			}
 			break;
 
-
 		case 3: // Найти потребителя по фамилии
-
+			system("cls");
 			// Переменная <y> хранит в себе индекс пользователя, найденного по фамилии,
 			// или же 999 в случае если такого пользователя нет
 			y = surname_search(ptr_struct, size);
@@ -81,18 +130,26 @@ void main() {
 				printf("Пользователь не найден\n");
 			break;
 
-
 		case 4: // Отсортировать список структур по критерию (сумма оплаты)
+			system("cls");
 			sort(ptr_struct, size);
 			break;
 
-
 		case 5: // Вывод информации о всех потребителях
-			tabulation(ptr_struct, 0, size);
+			system("cls");
+			full_tabulation(ptr_struct, size);
 			break;
 
+		case 6: // Запись в файл
+			system("cls");
+			writefile(ptr_struct, size);
+			break;
 
-		case 6: // Выход из программы
+		case 7: // Чтение с файла
+			system("cls");
+			readfile(ptr_struct, size);
+
+		case 8: // Выход из программы
 			break;
 		}
 	}
@@ -101,16 +158,17 @@ void main() {
 
 int compare_paymentname(const void* av, const void* bv) {
 	const data* a = av, * b = bv;
-	if (a->payment < b->payment) return -1;
-	if (a->payment > b->payment) return 1;
+	if (a->sr < b->sr) return -1;
+	if (a->sr > b->sr) return 1;
 	return strcmp(a->personal_account, b->personal_account);
 }
 
 // Сортировка по сумме оплаты
 void sort(data* ptr_struct, int size) {
 	qsort(ptr_struct, size, sizeof(data), compare_paymentname);
-	tabulation(ptr_struct, 0, size);
+	printf("Сортировка завершена\n");
 }
+
 
 void menu() {
 	puts("-------------------МЕНЮ--------------------");
@@ -120,17 +178,35 @@ void menu() {
 	puts("3. Найти потребителя по фамилии");
 	puts("4. Отсортировать по сумме оплаты");
 	puts("5. Вывести данные о потребителях");
-	puts("6. Выйти из программы");
+	puts("6. Запись в файл");
+	puts("7. Чтение с файла");
+	puts("8. Выход из программы");
 	puts("-------------------------------------------");
 }
 
-// Поиск потребителя по критерию (по сумме оплаты)
+// Поиск потребителя по критерию (по сумме оплаты за какой-либо месяц)
 int payment_search(data* ptr_struct, int size) {
 	int search_payment;
 	printf("Введите сумму оплаты : ");
 	scanf("%d", &search_payment);
 	for (int i = 0; i <= size; i++) {
-		if (ptr_struct[i].payment == search_payment) {
+		for (int j = 0; j < 3; j++) {
+			if (fabsf(ptr_struct[i].payment[j] - search_payment) < 0.1) {
+				return i;
+			}
+		}
+	}
+	// При несовпадении суммы оплаты ни с одним потребителем возвращаем 999 для обработки ошибок
+	return 999;
+}
+
+// Поиск потребителя по критерию (по общей сумме оплаты)
+int payment_sum_search(data* ptr_struct, int size) {
+	int search_payment;
+	printf("Введите сумму оплаты : ");
+	scanf("%d", &search_payment);
+	for (int i = 0; i <= size; i++) {
+		if (fabsf(ptr_struct[i].payment_sum - search_payment) < 1) {
 			return i;
 		}
 	}
@@ -154,14 +230,57 @@ int surname_search(data* ptr_struct, int size) {
 }
 
 // Табуляция информации о потребителе/потребителях на экран
-void tabulation(data* ptr_struct, int c, int k) {
-	for (int i = c; i < k; i++) {
-		printf("-----------------Потребитель #%d---------------------\n", i);
+void tabulation(data* ptr_struct, int start, int end) {
+	for (int i = start; start < end; start++) {
+
+		printf("-----------------Потребитель #%s---------------------\n", ptr_struct[i].personal_account);
 		printf("Лицевой счет: %s\n", &ptr_struct[i].personal_account);
 		printf("Фамилия: %s\n", &ptr_struct[i].surname);
-		printf("Текущее показание счетчика: %d\n", ptr_struct[i].current_counter);
-		printf("Начислено к оплате: %d\n", ptr_struct[i].for_payment);
-		printf("Сумма оплаты: %d\n", ptr_struct[i].payment);
+
+		printf("Показания счетчика: \n");
+		for (int j = 0; j < 3; j++) {
+			printf("   Месяц %d: %d\n", j+1, ptr_struct[i].current_counter[j]);
+		}
+
+		printf("Начислено к оплате:\n");
+		for (int j = 0; j < 3; j++) {
+			printf("   Месяц %d: %f\n", j + 1, ptr_struct[i].for_payment[j]);
+		}
+
+		printf("Сумма оплаты: \n");
+		for (int j = 0; j < 3; j++) {
+			printf("   Месяц %d: %f\n", j + 1, ptr_struct[i].payment[j]);
+		}
+		printf("   Средняя сумма оплаты = %f\n", ptr_struct[i].sr);
+
+		printf("Задолженность/переплата по месяцам: \n");
+		if (ptr_struct[i].debt_sum < 1) {
+			for (int j = 0; j < 3; j++) {
+				if (ptr_struct[i].debt[j] > 0.1) {
+					printf("   Месяц %d: Задолженность %f руб.\n", j+1, ptr_struct[i].debt[j]);
+				}
+				else {
+					printf("   Месяц %d: Переплата %f руб.\n", j + 1, fabsf(ptr_struct[i].debt[j]));
+				}
+			}
+			printf("\nНеобходимая для оплаты общая сумма %f руб.\n", ptr_struct[i].for_payment_sum);
+			printf("Общая сумма оплаты %f руб.\n", ptr_struct[i].payment_sum);
+			printf("Общая переплата %f руб.\n", fabsf(ptr_struct[i].debt_sum));
+		}
+		else {
+			for (int j = 0; j < 3; j++) {
+				if (ptr_struct[i].debt[j] > 0.1) {
+					printf("   Месяц %d: Задолженность %f руб.\n", j + 1, ptr_struct[i].debt[j]);
+				}
+				else {
+					printf("   Месяц %d: Переплата %f руб.\n", j + 1, fabsf(ptr_struct[i].debt[j]));
+				}
+			}
+			printf("\nНеобходимая для оплаты общая сумма %f руб.\n", ptr_struct[i].for_payment_sum);
+			printf("Общая сумма оплаты %f руб.\n", ptr_struct[i].payment_sum);
+			printf("Общая задолженность %f руб.\n", fabsf(ptr_struct[i].debt_sum));
+		}
+
 		printf("-----------------------------------------------------\n");
 
 	}
@@ -171,7 +290,7 @@ void tabulation(data* ptr_struct, int c, int k) {
 
 // Запись данных о потребителях
 void add_data(data* ptr_struct, int size) {
-	int tarif = 5; // Возьмем тариф за единицу показаний счетчика = 5 рублей
+	float tarif = 5.76; // Возьмем тариф за единицу показаний счетчика = 5.76 рублей
 	for (int i = 0; i < size; i++) {
 
 		printf("Введите номер лицевого счета: ");
@@ -180,16 +299,61 @@ void add_data(data* ptr_struct, int size) {
 		printf("Введите фамилию: ");
 		scanf("%s", &ptr_struct[i].surname);
 
-		printf("Введите показания счетчика: ");
-		scanf("%d", &ptr_struct[i].current_counter);
+		printf("Введите показания счетчика: \n");
+		// В цикле запрашиваем ввод с клавиатуры показание счетчика за определенынй месяц
+		for (int j = 0; j < 3; j++) {
+			printf("Месяц %d: \n", j + 1);
+			scanf("%d", &ptr_struct[i].current_counter[j]);
+		}
 
-		// Подсчет суммы денег, начисленной к оплате
-		ptr_struct[i].for_payment = tarif * ptr_struct[i].current_counter;
-		printf("Начислено к оплате: %d\n", ptr_struct[i].for_payment);
+		printf("Начислено к оплате: \n");
+		// В цикле подсчитываем сумму денег, начисленную к оплате за определенный месяц
+		for (int j = 0; j < 3; j++) {
+			ptr_struct[i].for_payment[j] = tarif * ptr_struct[i].current_counter[j];
+			printf("Месяц %d: %f руб.\n", j+1, ptr_struct[i].for_payment[j]);
+		}
+		ptr_struct[i].for_payment_sum = ptr_struct[i].for_payment[0] + ptr_struct[i].for_payment[1] + ptr_struct[i].for_payment[2];
 
-		printf("Сумма оплаты: ");
-		scanf("%d", &ptr_struct[i].payment);
+
+		printf("Сумма оплаты: \n");
+		// В цикле запрашиваем ввод с клавиатуры показание счетчика за определенынй месяц
+		for (int j = 0; j < 3; j++) {
+			printf("Месяц %d: \n", j + 1);
+			scanf("%f", &ptr_struct[i].payment[j]);
+			ptr_struct[i].debt[j] = ptr_struct[i].for_payment[j] - ptr_struct[i].payment[j];
+			ptr_struct[i].debt_sum += ptr_struct[i].debt[j];
+		}
+		ptr_struct[i].for_payment_sum = ptr_struct[i].for_payment[0] + ptr_struct[i].for_payment[1] + ptr_struct[i].for_payment[2];
+		ptr_struct[i].payment_sum = ptr_struct[i].payment[0] + ptr_struct[i].payment[1] + ptr_struct[i].payment[2];
+		ptr_struct[i].sr = ptr_struct[i].payment_sum / 3; 
+		ptr_struct[i].debt_sum = ptr_struct[i].debt[0] + ptr_struct[i].debt[1] + ptr_struct[i].debt[2];
 	}
 }
 
+// Чтение данных с файла
+void readfile(data* ptr_struct, int size) {
+	FILE* ptr_file = fopen("test.txt", "r");
 
+	for (int i = 0; i < size; i++) {
+		fscanf(ptr_file, "%s %s %d %d %d %f %f %f %f %f %f %f %f %f %f %f %f %f\n", &ptr_struct[i].personal_account, &ptr_struct[i].surname, &ptr_struct[i].current_counter[0], 
+			&ptr_struct[i].current_counter[1], &ptr_struct[i].current_counter[2], &ptr_struct[i].for_payment[0], &ptr_struct[i].for_payment[1],
+			&ptr_struct[i].for_payment[2], &ptr_struct[i].payment[0], &ptr_struct[i].payment[1], &ptr_struct[i].payment[2], &ptr_struct[i].debt[0], 
+			&ptr_struct[i].debt[1], &ptr_struct[i].debt[2], &ptr_struct[i].sr, &ptr_struct[i].debt_sum, &ptr_struct[i].for_payment_sum,
+			&ptr_struct[i].payment_sum);
+	}
+	printf("Чтение данных с файла завершено\n");
+	fclose(ptr_file);
+}
+
+// Запись данных в файл
+void writefile(data* ptr_struct, int size) {
+	FILE* ptr_file = fopen("test.txt", "w");
+	for (int i = 0; i < size; i++) {
+		fprintf(ptr_file, "%s %s %d %d %d %f %f %f %f %f %f %f %f %f %f %f %f %f\n", ptr_struct[i].personal_account, ptr_struct[i].surname, ptr_struct[i].current_counter[0],
+			ptr_struct[i].current_counter[1], ptr_struct[i].current_counter[2], ptr_struct[i].for_payment[0], ptr_struct[i].for_payment[1],
+			ptr_struct[i].for_payment[2], ptr_struct[i].payment[0], ptr_struct[i].payment[1], ptr_struct[i].payment[2], ptr_struct[i].debt[0],
+			ptr_struct[i].debt[1], ptr_struct[i].debt[2], ptr_struct[i].sr, ptr_struct[i].debt_sum, ptr_struct[i].for_payment_sum,
+			ptr_struct[i].payment_sum);
+	}
+	fclose(ptr_file);
+}
