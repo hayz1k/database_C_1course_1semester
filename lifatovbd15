@@ -6,7 +6,6 @@
 #include <math.h>
 #include <locale.h>
 #include <string.h>
-#include <conio.h>
 #include <stdlib.h>
 
 
@@ -269,7 +268,7 @@ void full_tabulation(data_t* ptr_struct, int size) {
 			ptr_struct[i].current_counter[0], ptr_struct[i].for_payment[0], ptr_struct[i].payment[0], ptr_struct[i].debt[0]);
 		printf("|         |                   |-------|-----------|-------------|--------------|               |-------------|             |             |             |\n");
 
-		printf("| #%d      | %15s   |	  2   | %4d      | %-8.2f    | %-8.2f     | %-8.2f      | % -8.2f    | % -8.2f    | %-8.2f    | %-8.2f    |\n",
+		printf("|  %3d    | %15s   |	  2   | %4d      | %-8.2f    | %-8.2f     | %-8.2f      | % -8.2f    | % -8.2f    | %-8.2f    | %-8.2f    |\n",
 			ptr_struct[i].personal_account, ptr_struct[i].surname, ptr_struct[i].current_counter[1], ptr_struct[i].for_payment[1], ptr_struct[i].payment[1],
 			ptr_struct[i].sr, ptr_struct[i].debt[1], ptr_struct[i].debt_sum, ptr_struct[i].for_payment_sum, ptr_struct[i].payment_sum);
 		printf("|         |                   |-------|-----------|-------------|--------------|               |-------------|             |             |             |\n");
@@ -326,7 +325,6 @@ int add_data(data_t* ptr_struct, int size) {
 // Чтение данных с файла
 int readfile(data_t** ptr_struct, int size) { 
 	int i = size - 1; 
-	printf("size = %d", size);
 	FILE* ptr_file = fopen("test.txt", "r");
 	if (ptr_file == NULL) {
 		puts("Ошибка открытия файла для чтения");
@@ -363,3 +361,4 @@ int writefile(data_t* ptr_struct, int size) {
 	fclose(ptr_file);
 	return size;
 }
+
