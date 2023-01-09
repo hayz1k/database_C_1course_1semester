@@ -35,13 +35,13 @@ int compare_paymentname(const data_t* av, const data_t* bv);
 void sort(data_t* ptr_struct, int size);
 int readfile(data_t** ptr_struct, int size);
 int writefile(data_t* ptr_struct, int size);
-
+int payment_search(data_t* ptr_struct, int size);
 
 
 
 void main() {
 	setlocale(LC_ALL, "RUS");
-	int x, y, size = 0, end = 0, choice;
+	int x, y, size = 0, end = 0, choice1, choice2;
 	char search_surname[20];
 
 	data_t* ptr_struct = (struct data_t*)malloc(COUNT * sizeof(data_t));
@@ -62,11 +62,25 @@ void main() {
 			// Переменная <x> хранит в себе индекс пользователя, найденного по сумме оплаты,
 			// или же 999 в случае если такого пользователя нет
 			system("cls");
-			x = payment_sum_search(ptr_struct, size);
-			if (x != 999)
-				tabulation(ptr_struct, x);
-			else
-				printf("Пользователь не найден\n");
+			puts("1. Поиск по общей сумме оплаты");
+			puts("2. Поиск по оплате за какой-либо месяц");
+			scanf("%d", &choice1);
+			switch (choice1) {
+			case 1:
+				x = payment_sum_search(ptr_struct, size);
+				if (x != 999)
+					tabulation(ptr_struct, x);
+				else
+					printf("Пользователь не найден\n");
+				break;
+			case 2:
+				x = payment_search(ptr_struct, size);
+				if (x != 999)
+					tabulation(ptr_struct, x);
+				else
+					printf("Пользователь не найден\n");
+				break;
+			}
 			break;
 
 		case 3: // Найти потребителя по фамилии
@@ -88,8 +102,8 @@ void main() {
 		case 5: // Вывод информации о всех потребителях
 			puts("1. Информация об оплате всех потребителей");
 			puts("2. Информация об общей сумме оплаты/для оплаты/долга, средней сумме оплаты");
-			scanf("%d", &choice);
-			switch (choice) {
+			scanf("%d", &choice2);
+			switch (choice2) {
 			case 1:
 				full_tabulation(ptr_struct, size);
 				break;
@@ -145,14 +159,30 @@ void menu() {
 
 // Поиск потребителя по критерию (по общей сумме оплаты)
 int payment_sum_search(data_t* ptr_struct, int size) {
-	int search_payment;
+	float search_payment;
 	printf("Введите сумму оплаты : ");
-	scanf("%d", &search_payment);
+	scanf("%f", &search_payment);
 	for (int i = 0; i < size; i++) {
 		// Взял "прощаемую" погрешность в 0.1 рубль для сравнения float
 		if (fabsf(ptr_struct[i].payment_sum - search_payment) < 0.1) {
 			return i;
 		}
+	}
+	// При несовпадении суммы оплаты ни с одним потребителем возвращаем 999 для обработки ошибок
+	return 999;
+}
+
+int payment_search(data_t* ptr_struct, int size) {
+	float payment;
+	printf("Введите сумму оплаты : ");
+	scanf("%f", &payment);
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < 12; j++) {
+			if (fabsf(ptr_struct[i].payment[j] - payment) < 0.1) {
+				return i;
+			}
+		}
+		// Взял "прощаемую" погрешность в 0.1 рубль для сравнения float
 	}
 	// При несовпадении суммы оплаты ни с одним потребителем возвращаем 999 для обработки ошибок
 	return 999;
@@ -193,9 +223,9 @@ void tabulation(data_t* ptr_struct, int i) {
 	for (int j = 0; j < 12; j++) {
 		printf("   Месяц %d: %.2f\n", j + 1, ptr_struct[i].payment[j]);
 	}
-	printf("   Средняя сумма оплаты = %.2f\n", ptr_struct[i].sr);
-
-	printf("\nНеобходимая для оплаты общая сумма %.2f руб.\n", ptr_struct[i].for_payment_sum);
+	printf("\nСредняя сумма оплаты = %.2f\n", ptr_struct[i].sr);
+	printf("Задолженность = %.2f\n", ptr_struct[i].debt_sum);
+	printf("Необходимая для оплаты общая сумма %.2f руб.\n", ptr_struct[i].for_payment_sum);
 	printf("Общая сумма оплаты %.2f руб.\n", ptr_struct[i].payment_sum);
 	printf("-----------------------------------------------------\n");
 }
